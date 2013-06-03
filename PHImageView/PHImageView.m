@@ -53,7 +53,7 @@
 -(void)initialize
 {
     cacheManager = [PHImageCacheManager sharedManager];
-    // Default Configuring
+    // Default Configuration
     changeImageFrameToImageFrame = NO;
     loadAutomaticly = NO;
     [self publicInit];
@@ -190,11 +190,7 @@
 
 - (void)publicInit
 {
-    // Animation View
-//    _animationView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
-//    _animationView.backgroundColor = [UIColor clearColor];
-//    _animationView.alpha = 0.0;
-//    [self addSubview:_animationView];
+
 }
 
 - (void)willStartImageLoading
@@ -204,18 +200,11 @@
 
 - (void)startImageLoading
 {
-//    _animationView.alpha = 1.0;
 }
 
 - (void)finishImageLoading
 {
-//    if (_animationView.alpha == 1.0)
-//    {
-//        [UIView beginAnimations:nil context:nil];
-//        [UIView setAnimationDuration:0.8];
-//        _animationView.alpha = 0.0;
-//        [UIView commitAnimations];
-//    }
+
 }
 
 - (void)failedImageLoading

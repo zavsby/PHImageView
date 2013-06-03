@@ -25,9 +25,6 @@
 
 - (void)main
 {
-//    NSURLResponse* response = nil;
-//    NSError *error = nil;
-//    DDLogInfo(@"Started request %@ in THREAD %@", self.imageUrl, [NSThread currentThread]);
     NSURLRequest* request = [NSURLRequest requestWithURL:_imageUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
     NSURLConnection *urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     
@@ -37,30 +34,6 @@
     [urlConnection scheduleInRunLoop:runloop forMode:NSDefaultRunLoopMode];
     [urlConnection start];
     [runloop run];
-    
-
-//    _responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-//    if (!self.isCancelled)
-//    {
-//        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-//        if (error == nil && httpResponse.statusCode == 200)
-//        {
-//            if ([_delegate respondsToSelector:_didFinishSelector])
-//            {
-//                [_delegate  performSelector:_didFinishSelector withObject:self];
-//            }
-//        }
-//        else
-//        {
-//            _error = error;
-//            if ([_delegate respondsToSelector:_didFailSelector])
-//            {
-//                [_delegate performSelector:_didFailSelector withObject:self];
-//            }
-//        }
-//
-//    }
-//    [self completeOperation];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
@@ -80,7 +53,6 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-//    DDLogInfo(@"Received response %@ in THREAD %@", self.imageUrl, [NSThread currentThread]);
     _response = (NSHTTPURLResponse *)response;
     _responseData = [NSMutableData data];
 }
@@ -92,7 +64,6 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-//    DDLogInfo(@"Finished request %@ in THREAD %@", self.imageUrl, [NSThread currentThread]);
     if (!self.isCancelled)
     {
         if (_response.statusCode == 200)
