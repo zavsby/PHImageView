@@ -24,21 +24,15 @@
 
 @implementation PHImageCacheManager
 
-static PHImageCacheManager* _instance;
-
-@synthesize maxConcurrentImageOperations;
-@synthesize maxDiskCacheSize;
-@synthesize maxMemoryCacheElements;
-@synthesize operationQueue;
-
 #pragma mark - Initialization
 
-+(id)instance
++ (PHImageCacheManager *)sharedManager
 {
-    if (_instance == nil)
-    {
-        _instance = [[PHImageCacheManager alloc] init];
-    }
+    static PHImageCacheManager* _instance;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _instance = [[self alloc] init];
+    });
     return _instance;
 }
 
@@ -54,25 +48,17 @@ static PHImageCacheManager* _instance;
 
 - (void)initialize
 {
-    operationQueue = [[NSOperationQueue alloc] init];
-    maxConcurrentImageOperations = 5;
-    maxMemoryCacheElements = 50;
-    maxDiskCacheSize = 1024 * 1024 * 15;
-    // Отключение встроенного в NSURLConnection кэша (для iOS 5 - встроенного дискового кэша)
+    _operationQueue = [[NSOperationQueue alloc] init];
+    _maxConcurrentImageOperations = 5;
+    _maxMemoryCacheElements = 50;
+    _maxDiskCacheSize = 1024 * 1024 * 15;
+    // For former iOS 4.3 compatibility
+    _priorityForDispatchAsync = DISPATCH_QUEUE_PRIORITY_BACKGROUND;
+    // Setup native iOS HTTP Caching
     NSURLCache *urlCache = [[NSURLCache alloc] initWithMemoryCapacity:1024*1024*1 diskCapacity:1024*1024*4 diskPath:nil];
     [NSURLCache setSharedURLCache:urlCache];
     
     [self loadCache];
-    
-    // Для совместимости с iOS < 5.0
-    if (SYSTEM_VERSION_LESS_THAN(@"5.0"))
-    {
-        _priorityForDispatchAsync = DISPATCH_QUEUE_PRIORITY_DEFAULT;
-    }
-    else
-    {
-        _priorityForDispatchAsync = DISPATCH_QUEUE_PRIORITY_BACKGROUND;
-    }
 }
 
 - (void)loadCache

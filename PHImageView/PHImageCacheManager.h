@@ -36,7 +36,7 @@
 @property (nonatomic, assign) NSInteger maxMemoryCacheElements;
 @property (nonatomic, readonly) NSOperationQueue *operationQueue;
 
-+ (id)instance;
++ (PHImageCacheManager *)sharedManager;
 
 // Инициализация и подготовка к работе кэша
 - (void)loadCache;
