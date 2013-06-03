@@ -28,9 +28,9 @@
 - (void)setupCacheManager
 {
     // Setup Cache Manager
-    [[PHImageCacheManager instance] setMaxConcurrentImageOperations:5];
-    [[PHImageCacheManager instance] setMaxDiskCacheSize:1024 * 1024 * 10];
-    [[PHImageCacheManager instance] setMaxMemoryCacheElements:50];
+    [[PHImageCacheManager sharedManager] setMaxConcurrentImageOperations:5];
+    [[PHImageCacheManager sharedManager] setMaxDiskCacheSize:1024 * 1024 * 10];
+    [[PHImageCacheManager sharedManager] setMaxMemoryCacheElements:50];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

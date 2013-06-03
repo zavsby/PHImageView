@@ -65,7 +65,7 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    DDLogInfo(@"FAIL CONNECTION!");
+    ALog(@"FAIL CONNECTION!");
     if (!self.isCancelled)
     {
         _error = error;

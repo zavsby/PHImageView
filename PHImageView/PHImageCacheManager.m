@@ -63,7 +63,7 @@
 
 - (void)loadCache
 {
-    // Создание папки для хранения кэша
+    // Creating folder for cache
     NSFileManager *fileManager = [NSFileManager defaultManager];
     diskCachePath = [[[UIApplication sharedApplication] documentsDirectory] stringByAppendingPathComponent:@"Constant"];
     NSError *error = nil;
@@ -72,7 +72,7 @@
         ALog(@"Caching is unavailable: %@!",error.localizedDescription);
         return;
     }
-    // Просмотр папки с кэшем
+    // Getting contents of cache directory
     NSArray *directoryFiles = [fileManager contentsOfDirectoryAtPath:diskCachePath error:&error];
     if (error != nil)
     {
@@ -82,7 +82,7 @@
     memoryImageCache = [[NSMutableArray alloc] initWithCapacity:50];
     diskImageCache = [[NSMutableArray alloc] initWithCapacity:directoryFiles.count];
     currentDiskCacheSize = 0;
-    // Инициализация дискового кэша из папки для хранения кэша
+    // Initialize disk cache from cache folder
     for (NSString *file in directoryFiles)
     {
         PHPhotoObject *pObj = [[PHPhotoObject alloc] init];
@@ -91,16 +91,16 @@
         currentDiskCacheSize += pObj.size;
         [diskImageCache addObject:pObj];
     }
-    // Создания массива активных (которые находятся в состоянии загрузки картинки) ImageView
+    // Creating an array of active ImageViews (which is downloading images)
     activeImageViews = [[NSMutableSet alloc] initWithCapacity:16];
 }
 
 #pragma mark - Properties
 
-- (void)setMaxConcurrentImageOperations:(NSInteger)_maxConcurrentImageOperations
+- (void)setMaxConcurrentImageOperations:(NSInteger)maxConcurrentImageOperations
 {
-    maxConcurrentImageOperations = _maxConcurrentImageOperations;
-    operationQueue.maxConcurrentOperationCount = _maxConcurrentImageOperations;
+    _maxConcurrentImageOperations = maxConcurrentImageOperations;
+    _operationQueue.maxConcurrentOperationCount = maxConcurrentImageOperations;
 }
 
 #pragma mark - Public direct getting images methods
@@ -126,7 +126,7 @@
     imageOperation.didFailSelector = @selector(imageDownloadFailed:);
     imageOperation.didFinishSelector = @selector(imageDownloadFinished:);
     imageOperation.params = params;
-    [operationQueue addOperation:imageOperation];
+    [_operationQueue addOperation:imageOperation];
 }
 
 -(void)imageDownloadFailed:(PHImageOperation *)operation
@@ -164,11 +164,11 @@
 
 -(void)imageDownloadFinished:(PHImageOperation *)operation
 {
-    // Теперь нужно найти imageView, которому эта картинка нужна
-    // Если мы его нашли, то запускаем вначале transform асинхронно
-    // Затем запускаем в main thread метод из imageView и удаляем из множества imageView
-    // И асинхронно сохраняем картинку в кэш в памяти и на диск
-    // Если же картинка не нужна никому, то imageView остается в множестве
+    // Now we should find imageView, which wants this image
+    // If we found it, we start async transform (if transform selector not nil)
+    // Then we start imageView show method on main thread and remove imageview from activeImageViews
+    // And save image async in cache on disk and memory
+    // If we didn't find imageView which was needed this image then we just save image
     @autoreleasepool
     {
         UIImage* image = [UIImage imageWithData:operation.responseData];
@@ -228,7 +228,7 @@
         return imgFromMemory;
     }
     
-    // проверка есть ли картинка в кэше на диске (далее в background потоке)
+    // Check if we have image in disk cache (in background thread)
     dispatch_async(dispatch_get_global_queue(_priorityForDispatchAsync, 0), ^(void) {
         NSURL *imgUrl = imageView.imageURL;
         BOOL didFoundInCache = [self getImageFromDiskCache:imageView.imageName params:params imageView:imageView];
@@ -272,12 +272,12 @@
     if (photo != nil)
     {
         //NSLog(@"Found in disk cache!");
-        // грузим с диска картинку в память (добавляя в кэш памяти)
+        // Load image from disk in memory (adding to cache)
         NSString* filePath = [diskCachePath stringByAppendingPathComponent:imageName];
         UIImage* imgFromCache = [UIImage imageWithData:[NSData dataWithContentsOfFile:filePath]];
-        // здесь нужно выводить в imageView (в Main Thread)
+        // Here we need to show image in ImageView (in Main Thread)
         [imageView performSelectorOnMainThread:@selector(mainThreadLoadImageActions:) withObject:imgFromCache waitUntilDone:NO];
-        // добавляем в кэш в памяти картинку (асинхронно)
+        // Adding image to memory cache (async)
         photo.image = imgFromCache;
         photo.temperaly = params.isTemperaly;
         [self addImageToMemoryCache:photo];
@@ -311,14 +311,14 @@
     {
         [memoryImageCache addObject:photoObject];
     }
-    // проверка нужна ли сборка мусора в кэше памяти
-    if (memoryImageCache.count >= maxMemoryCacheElements)
+    // Check if we need garbage collect of memory cache
+    if (memoryImageCache.count >= _maxMemoryCacheElements)
     {
         @synchronized(self)
         {
-            // начинаем сборку мусора
+            // Start garbage collecting
             [self clearTemperalyImagesInMemory];
-            if (memoryImageCache.count >= maxMemoryCacheElements)
+            if (memoryImageCache.count >= _maxMemoryCacheElements)
             {
                 [self clearMemoryCache:0.6];
             }
@@ -357,14 +357,14 @@
         currentDiskCacheSize += photoObj.size;
     }
     //NSLog(@"currentCacheSize:%d",currentDiskCacheSize);
-    // проверка нужна ли сборка мусор в кэше на диске
-    if (currentDiskCacheSize > maxDiskCacheSize)
+    // Check if we need garbage collect of disk cache
+    if (currentDiskCacheSize > _maxDiskCacheSize)
     {
-        // начинаем сборку мусора
+        // Start garbage collecting
         @synchronized(self)
         {
             [self clearTemperalyImagesOnDisk];
-            if (currentDiskCacheSize > maxDiskCacheSize)
+            if (currentDiskCacheSize > _maxDiskCacheSize)
             {
                 [self clearDiskCache:0.5];
             }
@@ -382,7 +382,7 @@
         NSFileManager *fileManager = [NSFileManager defaultManager];
         if ([fileManager fileExistsAtPath:cachePath] == YES)
         {
-            // Такого быть не должно, иначе индексный файл испорчен!
+            // Index file is corrupted if we are here
             return;
         }
         NSData* imageData = nil;
@@ -396,7 +396,6 @@
         }
         if (![fileManager createFileAtPath:cachePath contents:imageData attributes:nil])
         {
-            // Файл создать не удалось
             ALog(@"Failed to create file!");
             return;
         }
@@ -451,25 +450,25 @@
 -(void)cleanDiskCacheBeforeExit
 {
     [self clearTemperalyImagesOnDisk];
-    if (currentDiskCacheSize > 0.85 * maxDiskCacheSize)
+    if (currentDiskCacheSize > 0.85 * _maxDiskCacheSize)
     {
         [self clearDiskCache:0.3];
     }
     else
     {
-        if (currentDiskCacheSize > 0.75 * maxDiskCacheSize)
+        if (currentDiskCacheSize > 0.75 * _maxDiskCacheSize)
         {
             [self clearDiskCache:0.25];
         }
         else
         {
-            if (currentDiskCacheSize > 0.65 * maxDiskCacheSize)
+            if (currentDiskCacheSize > 0.65 * _maxDiskCacheSize)
             {
                 [self clearDiskCache:0.2];
             }
             else
             {
-                if (currentDiskCacheSize > 0.5 * maxDiskCacheSize)
+                if (currentDiskCacheSize > 0.5 * _maxDiskCacheSize)
                 {
                     [self clearDiskCache:0.1];
                 }
@@ -525,7 +524,7 @@
 
 - (void)moveAtTheBottomElement:(PHPhotoObject *)photoObj inArray:(NSMutableArray *)array
 {
-    // проверяем не является ли уже верхним элемент
+    // checking  whether the item is already on top
     @synchronized(array)
     {
         if (photoObj == [array objectAtIndex:array.count-1])

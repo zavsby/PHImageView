@@ -27,7 +27,7 @@
     NSMutableArray *memoryImageCache;
     NSMutableSet *activeImageViews;
     NSString *diskCachePath;
-    // для совместимости с iOS < 5.0
+    // For former iOS < 5.0 compatibility
     long _priorityForDispatchAsync;
 }
 
@@ -38,37 +38,37 @@
 
 + (PHImageCacheManager *)sharedManager;
 
-// Инициализация и подготовка к работе кэша
+// Initializing and preparing for cache (do not call it manually)
 - (void)loadCache;
-
+// For internal imageView using only
 - (UIImage *)getImageForImageView:(PHImageView *)imageView params:(PHImageCacheParams *)params;
 
 //
-// Дополнительные методы для прямого получения картинок
+// Methods for direct getting images
 //
 
-// Возвращает картинку из кэша (дискового или памяти), если картинки в кэше нет, то возвращает nil
+// Returns image from cache (disk or memory), if image is not it cache, return NIL
 - (UIImage *)getImageFromCache:(NSURL *)imageUrl;
-// Возвращает картинку из кэша (дискового или памяти), или загружает ее, если ее там нет (через Notification)
+// Returns image from cache (disk or memory), or download it, if it is not in cache (NOT IMPLEMENTED YET)
 // Notification: PHImageCacheImageWasDownloadedNotification
 //- (UIImage *)getImageOrDownload:(NSURL *)imageUrl shouldSaveToCache:(BOOL)shouldSave;
 
 //
-// Методы для очистки кэша
+// Cache cleaning methods
 //
 
-// Полная очистка временного кэша в памяти
+// Full cleaning of temporary cache in memory
 - (void)clearTemperalyImagesInMemory;
-// Полная очистка врменного кэша на диске (не рекомендуется вызывать вручную)
+// Full cleaning of temporary cache on disk (not recommended to call manually)
 - (void)clearTemperalyImagesOnDisk;
-// Ручной запуск сборщика мусора для дискового кэша (при передаче 1 параметром очищает ВЕСЬ кэш)
+// Manual launch of garbage collector for disk cache (if percent==1 then clean all cache)
 - (void)clearDiskCache:(float)percent;
-// Ручной запуск сборщика мусора для кэша в памяти
+// Manual launch of garbage collector for memory cache (if percent==1 then clean all cache)
 - (void)clearMemoryCache:(float)percent;
-// Метод производит очистку кэша перед выходом из приложения, удаляя весь временный кэш, а также очищая при необходимости основной кэш
+// Method cleans cache before exit from application, it removes temporary cache and clean main cache if needed
 - (void)cleanDiskCacheBeforeExit;
 
-// Возвращает текущий размер дискового кэша
+// Returns current disk cache size
 + (unsigned long)cacheSize;
 
 @end

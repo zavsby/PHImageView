@@ -52,7 +52,7 @@
 
 -(void)initialize
 {
-    cacheManager = [PHImageCacheManager instance];
+    cacheManager = [PHImageCacheManager sharedManager];
     // Default Configuring
     changeImageFrameToImageFrame = NO;
     loadAutomaticly = NO;
@@ -147,14 +147,14 @@
     }
     
     UIImage *image = [cacheManager getImageForImageView:self params:params];
-    // мы получим не nil значение только при условии что картинка была в памяти
+    // We don't reveive nil only if image was in memory
     if (image != nil)
     {
         [self performSelectorOnMainThread:@selector(mainThreadLoadImageActions:) withObject:image waitUntilDone:NO];
     }
     else
     {
-        // иначе мы запрашиваем картинку из дискового кэша или сервера и imageView либо получит эту картинку, либо запросит другую картинку
+        // Else we request image from disk cache or server
         [self startImageLoading];
     }
 }
@@ -220,7 +220,7 @@
 
 - (void)failedImageLoading
 {
-    DDLogError(@"Failed loading image.");
+    ALog(@"Failed loading image.");
 }
 
 #pragma mark - Touch events
