@@ -15,10 +15,9 @@
     return [[self alloc] init];
 }
 
-+ (id)cacheParamsWithImageFormat:(ImageFormat)imageFormat isTemp:(BOOL)isTemp
++ (id)cacheParamsWithTemporary:(BOOL)isTemp
 {
     PHImageCacheParams *params = [[PHImageCacheParams alloc] init];
-    params.imageFormat = imageFormat;
     params.isTemperaly = isTemp;
     return params;
 }
@@ -29,7 +28,6 @@
     if (self)
     {
         _shouldSaveToDiskCache = YES;
-        _imageFormat = ImageFormatJPEG;
         _isTemperaly = NO;
     }
     return self;

@@ -24,6 +24,9 @@
 
 @implementation PHImageCacheManager
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+
 #pragma mark - Initialization
 
 + (PHImageCacheManager *)sharedManager
@@ -172,6 +175,7 @@
     @autoreleasepool
     {
         UIImage* image = [UIImage imageWithData:operation.responseData];
+        NSData *imageData = operation.responseData;
         NSString* md5 = operation.imageUrl.absoluteString.md5;
         SEL transformSelector = operation.params.transformSelector;
         id transformTarget = operation.params.transformTarget;
@@ -193,11 +197,9 @@
         
         if ([transformTarget respondsToSelector:transformSelector])
         {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+
             image = [transformTarget performSelector:transformSelector withObject:image];
-#pragma clang diagnostic pop
-            operation.params.imageFormat = ImageFormatPNG;
+            imageData = UIImagePNGRepresentation(image);
         }
         
         if (waitingImageViews.count > 0)
@@ -214,7 +216,7 @@
                 }
             }
         }
-        [self saveImage:image md5:md5 params:operation.params];
+        [self saveImage:image imageData:imageData md5:md5 params:operation.params];
     }
 }
 
@@ -372,7 +374,7 @@
     }
 }
 
-- (void)saveImage:(UIImage *)image md5:(NSString *)imageName params:(PHImageCacheParams *)params
+- (void)saveImage:(UIImage *)image imageData:(NSData *)imageData md5:(NSString *)imageName params:(PHImageCacheParams *)params
 {
     PHPhotoObject* photoImage = [[PHPhotoObject alloc] init];
     
@@ -384,15 +386,6 @@
         {
             // Index file is corrupted if we are here
             return;
-        }
-        NSData* imageData = nil;
-        if (params.imageFormat == ImageFormatPNG)
-        {
-            imageData = UIImagePNGRepresentation(image);
-        }
-        else
-        {
-            imageData = UIImageJPEGRepresentation(image, 0.7);
         }
         if (![fileManager createFileAtPath:cachePath contents:imageData attributes:nil])
         {
@@ -571,5 +564,7 @@
     
     return fileSize;
 }
+
+#pragma clang diagnostic pop
 
 @end

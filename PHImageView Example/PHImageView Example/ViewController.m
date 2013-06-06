@@ -26,4 +26,29 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Table View Delegate
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *cellId = @"ImageCell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+    if (cell == nil)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+    }
+    
+    return cell;
+}
+
+- (int)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+
+- (int)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
 @end

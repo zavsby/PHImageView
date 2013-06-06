@@ -42,8 +42,6 @@
 
 - (void)loadImage:(NSURL *)imageUrl;
 - (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache;
-- (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache saveAs:(ImageFormat)imageFormat;
-- (void)loadImage:(NSURL *)imageUrl saveAs:(ImageFormat)imageFormat;
 
 - (void)loadImage:(NSURL *)imageUrl params:(PHImageCacheParams *)params;
 

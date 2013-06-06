@@ -106,17 +106,7 @@
 
 - (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache
 {
-    [self loadImage:imageUrl tempCache:tempCache saveAs:ImageFormatJPEG];
-}
-
-- (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache saveAs:(ImageFormat)imageFormat
-{
-    [self loadImage:imageUrl params:[PHImageCacheParams cacheParamsWithImageFormat:imageFormat isTemp:tempCache]];
-}
-
-- (void)loadImage:(NSURL *)imageUrl saveAs:(ImageFormat)imageFormat
-{
-    [self loadImage:imageUrl params:[PHImageCacheParams cacheParamsWithImageFormat:imageFormat isTemp:NO]];
+    [self loadImage:imageURL params:[PHImageCacheParams cacheParamsWithTemporary:tempCache]];
 }
 
 - (void)loadImage:(NSURL *)imageUrl params:(PHImageCacheParams *)params
