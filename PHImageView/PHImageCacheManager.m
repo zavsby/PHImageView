@@ -12,7 +12,6 @@
 - (void)imageDownloadFinished:(PHImageOperation *)operation;
 - (void)imageDownloadFailed:(PHImageOperation *)operation;
 
--(void)saveImage:(UIImage *)image md5:(NSString *)imageName params:(PHImageCacheParams *)params;
 - (void)addImageToMemoryCache:(PHPhotoObject *)photoObject;
 - (void)addImageToDiskCache:(PHPhotoObject *)photoObj;
 

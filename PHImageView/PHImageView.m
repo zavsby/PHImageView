@@ -17,13 +17,6 @@
 
 @implementation PHImageView
 
-@synthesize delegate;
-@synthesize changeImageFrameToImageFrame;
-@synthesize transformSelector;
-@synthesize imageURL;
-@synthesize imageName;
-@synthesize loadAutomaticly;
-
 #pragma mark - Initialization
 - (id)initWithFrame:(CGRect)frame
 {
@@ -54,8 +47,8 @@
 {
     cacheManager = [PHImageCacheManager sharedManager];
     // Default Configuration
-    changeImageFrameToImageFrame = NO;
-    loadAutomaticly = NO;
+    _changeImageFrameToImageFrame = NO;
+    _loadAutomaticly = NO;
     [self publicInit];
 }
 
@@ -81,10 +74,10 @@
 
 #pragma mark - Properties
 
--(void)setImageURL:(NSURL *)_imageURL
+-(void)setImageURL:(NSURL *)imageURL
 {
-    imageURL = _imageURL;
-    if (loadAutomaticly)
+    _imageURL = imageURL;
+    if (_loadAutomaticly)
     {
         [self loadImage:imageURL];
     }
@@ -106,7 +99,7 @@
 
 - (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache
 {
-    [self loadImage:imageURL params:[PHImageCacheParams cacheParamsWithTemporary:tempCache]];
+    [self loadImage:_imageURL params:[PHImageCacheParams cacheParamsWithTemporary:tempCache]];
 }
 
 - (void)loadImage:(NSURL *)imageUrl params:(PHImageCacheParams *)params
@@ -119,7 +112,7 @@
         return;
     }
     
-    if ([imageUrl.absoluteString isEqualToString:imageURL.absoluteString] && self.image != nil)
+    if ([imageUrl.absoluteString isEqualToString:_imageURL.absoluteString] && self.image != nil)
     {
         return;
     }
@@ -128,12 +121,12 @@
     {
         self.image = nil;
         self.imageURL = imageUrl;
-        imageName = [imageUrl.absoluteString md5];
+        _imageName = [imageUrl.absoluteString md5];
     }
     
-    if ([delegate respondsToSelector:@selector(asyncImageViewImageWillStartLoading:)])
+    if ([_delegate respondsToSelector:@selector(asyncImageViewImageWillStartLoading:)])
     {
-        [delegate asyncImageViewImageWillStartLoading:self];
+        [_delegate asyncImageViewImageWillStartLoading:self];
     }
     
     UIImage *image = [cacheManager getImageForImageView:self params:params];
@@ -151,7 +144,7 @@
 
 - (void)mainThreadLoadImageActions:(UIImage *)image
 {
-    if (changeImageFrameToImageFrame)
+    if (_changeImageFrameToImageFrame)
     {
         self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.image.size.width, self.image.size.height);
     }
@@ -160,9 +153,9 @@
     
     self.image = image;
     
-    if (([delegate respondsToSelector:@selector(asyncImageViewImageDidLoad:)])&&(delegate != nil))
+    if (([_delegate respondsToSelector:@selector(asyncImageViewImageDidLoad:)]) && (_delegate != nil))
     {
-        [delegate asyncImageViewImageDidLoad:self];
+        [_delegate asyncImageViewImageDidLoad:self];
     }
 }
 
@@ -170,9 +163,9 @@
 {
     [self failedImageLoading];
     
-    if ([delegate respondsToSelector:@selector(asyncImageViewImageDidFailedLoad:)])
+    if ([_delegate respondsToSelector:@selector(asyncImageViewImageDidFailedLoad:)])
     {
-        [delegate asyncImageViewImageDidFailedLoad:nil];
+        [_delegate asyncImageViewImageDidFailedLoad:nil];
     }
 }
 
@@ -206,14 +199,14 @@
 
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (![delegate respondsToSelector:@selector(asyncImageViewImageDidTapped:)])
+    if (![_delegate respondsToSelector:@selector(asyncImageViewImageDidTapped:)])
     {
         return;
     }
     UITouch* touch = [touches anyObject];
     if (touch.tapCount == 1)
     {
-        [delegate asyncImageViewImageDidTapped:self];
+        [_delegate asyncImageViewImageDidTapped:self];
     }
 }
 

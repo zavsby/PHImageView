@@ -38,7 +38,6 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    ALog(@"FAIL CONNECTION!");
     if (!self.isCancelled)
     {
         _error = error;
