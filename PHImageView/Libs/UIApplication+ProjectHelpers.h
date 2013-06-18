@@ -10,6 +10,7 @@
 
 @interface UIApplication (ProjectHelpers)
 
++ (NSString *)cachesDirectory;
 - (NSString *)documentsDirectory;
 + (int)screenHeight;
 + (BOOL)is4InchDevice;

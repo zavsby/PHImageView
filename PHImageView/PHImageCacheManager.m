@@ -67,7 +67,7 @@
 {
     // Creating folder for cache
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    diskCachePath = [[[UIApplication sharedApplication] documentsDirectory] stringByAppendingPathComponent:@"Constant"];
+    diskCachePath = [[UIApplication cachesDirectory] stringByAppendingPathComponent:@"Constant"];
     NSError *error = nil;
     if (![fileManager createDirectoryAtPath:diskCachePath withIntermediateDirectories:YES attributes:nil error:&error])
     {
@@ -390,6 +390,14 @@
         {
             ALog(@"Failed to create file!");
             return;
+        }
+        
+        NSError *error = nil;
+        BOOL success = [[NSURL fileURLWithPath:cachePath] setResourceValue: @YES
+                                                                    forKey: NSURLIsExcludedFromBackupKey error: &error];
+        if (!success)
+        {
+            ALog(@"Failed to set NOT_BACKUP attribute.");
         }
         
         photoImage.size = [self getFileSize:cachePath];

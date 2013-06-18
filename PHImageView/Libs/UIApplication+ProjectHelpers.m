@@ -17,6 +17,13 @@
     return basePath;
 }
 
++ (NSString *)cachesDirectory
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *basePath = (paths.count > 0) ? paths[0] : nil;
+    return basePath;
+}
+
 + (int)screenHeight
 {
     return (int)[[UIScreen mainScreen] bounds].size.height;
