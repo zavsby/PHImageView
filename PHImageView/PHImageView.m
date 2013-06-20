@@ -99,7 +99,7 @@
 
 - (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache
 {
-    [self loadImage:_imageURL params:[PHImageCacheParams cacheParamsWithTemporary:tempCache]];
+    [self loadImage:imageUrl params:[PHImageCacheParams cacheParamsWithTemporary:tempCache]];
 }
 
 - (void)loadImage:(NSURL *)imageUrl params:(PHImageCacheParams *)params
