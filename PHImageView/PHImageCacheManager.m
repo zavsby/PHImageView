@@ -71,7 +71,7 @@
     NSError *error = nil;
     if (![fileManager createDirectoryAtPath:diskCachePath withIntermediateDirectories:YES attributes:nil error:&error])
     {
-        ALog(@"Caching is unavailable: %@!",error.localizedDescription);
+        ALog(@"Caching is unavailable: %@!", error.localizedDescription);
         return;
     }
     // Getting contents of cache directory
@@ -84,6 +84,7 @@
     memoryImageCache = [[NSMutableArray alloc] initWithCapacity:50];
     diskImageCache = [[NSMutableArray alloc] initWithCapacity:directoryFiles.count];
     currentDiskCacheSize = 0;
+    
     // Initialize disk cache from cache folder
     for (NSString *file in directoryFiles)
     {
@@ -93,6 +94,7 @@
         currentDiskCacheSize += pObj.size;
         [diskImageCache addObject:pObj];
     }
+    
     // Creating an array of active ImageViews (which is downloading images)
     activeImageViews = [[NSMutableSet alloc] initWithCapacity:16];
 }
@@ -131,7 +133,7 @@
     [_operationQueue addOperation:imageOperation];
 }
 
--(void)imageDownloadFailed:(PHImageOperation *)operation
+- (void)imageDownloadFailed:(PHImageOperation *)operation
 {
     NSString* md5 = operation.imageUrl.absoluteString.md5;
     NSMutableSet *waitingImageViews = [NSMutableSet set];
@@ -164,7 +166,7 @@
     }
 }
 
--(void)imageDownloadFinished:(PHImageOperation *)operation
+- (void)imageDownloadFinished:(PHImageOperation *)operation
 {
     // Now we should find imageView, which wants this image
     // If we found it, we start async transform (if transform selector not nil)
@@ -327,7 +329,7 @@
     }
 }
 
--(void)clearMemoryCache:(float)percent
+- (void)clearMemoryCache:(float)percent
 {
     if (percent > 0.99)
     {
@@ -350,7 +352,7 @@
 
 #pragma mark - Disk Cache
 
--(void)addImageToDiskCache:(PHPhotoObject *)photoObj
+- (void)addImageToDiskCache:(PHPhotoObject *)photoObj
 {
     @synchronized(diskImageCache)
     {
@@ -414,7 +416,7 @@
     }
 }
 
--(void)clearDiskCache:(float)percent
+- (void)clearDiskCache:(float)percent
 {
     NSFileManager* fileManager = [NSFileManager defaultManager];
     if (percent > 0.99)
@@ -447,7 +449,7 @@
 #pragma mark - Cleaning on exit
 
 // This method could be overridden
--(void)cleanDiskCacheBeforeExit
+- (void)cleanDiskCacheBeforeExit
 {
     [self clearTemperalyImagesOnDisk];
     if (currentDiskCacheSize > 0.85 * _maxDiskCacheSize)

@@ -37,8 +37,8 @@
 
 @property (nonatomic, strong) id userObject;
 
--(id)initWithURL:(NSURL *)imageUrl;
--(id)initWithURL:(NSURL *)imageUrl frame:(CGRect)frame;
+- (id)initWithURL:(NSURL *)imageUrl;
+- (id)initWithURL:(NSURL *)imageUrl frame:(CGRect)frame;
 
 - (void)loadImage:(NSURL *)imageUrl;
 - (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache;

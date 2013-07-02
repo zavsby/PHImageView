@@ -28,12 +28,12 @@
     return self;
 }
 
--(void)awakeFromNib
+- (void)awakeFromNib
 {
     [self initialize];
 }
 
--(id)init
+- (id)init
 {
     self = [super init];
     if (self)
@@ -43,7 +43,7 @@
     return self;
 }
 
--(void)initialize
+- (void)initialize
 {
     cacheManager = [PHImageCacheManager sharedManager];
     // Default Configuration
@@ -52,7 +52,7 @@
     [self publicInit];
 }
 
--(id)initWithURL:(NSURL *)imageUrl
+- (id)initWithURL:(NSURL *)imageUrl
 {
     self = [super init];
     if (self)
@@ -62,7 +62,7 @@
     return self;
 }
 
--(id)initWithURL:(NSURL *)imageUrl frame:(CGRect)frame
+- (id)initWithURL:(NSURL *)imageUrl frame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self)
@@ -74,7 +74,7 @@
 
 #pragma mark - Properties
 
--(void)setImageURL:(NSURL *)imageURL
+- (void)setImageURL:(NSURL *)imageURL
 {
     _imageURL = imageURL;
     if (_loadAutomaticly)
@@ -104,8 +104,6 @@
 
 - (void)loadImage:(NSURL *)imageUrl params:(PHImageCacheParams *)params
 {
-    [self willStartImageLoading];
-    
     if (imageUrl == nil)
     {
         self.image = nil;
@@ -116,6 +114,8 @@
     {
         return;
     }
+    
+    [self willStartImageLoading];
     
     if (imageUrl != self.imageURL)
     {
@@ -197,7 +197,7 @@
 
 #pragma mark - Touch events
 
--(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (![_delegate respondsToSelector:@selector(asyncImageViewImageDidTapped:)])
     {
