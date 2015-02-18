@@ -54,7 +54,7 @@
     NSError *error = nil;
     if (![fileManager createDirectoryAtPath:_diskCachePath withIntermediateDirectories:YES attributes:nil error:&error])
     {
-        DDLogInfo(@"Caching is unavailable: %@!",error.localizedDescription);
+        NSLog(@"Caching is unavailable: %@!",error.localizedDescription);
         return;
     }
     
@@ -62,7 +62,7 @@
     NSArray *directoryFiles = [fileManager contentsOfDirectoryAtPath:_diskCachePath error:&error];
     if (error != nil)
     {
-        DDLogInfo(@"Error accessing disk cache directory: %@",error.localizedDescription);
+        NSLog(@"Error accessing disk cache directory: %@",error.localizedDescription);
         return;
     }
     _memoryImageCache = [[NSMutableArray alloc] initWithCapacity:_maxMemoryCacheElements];
@@ -345,7 +345,7 @@
     }
     else
     {
-        DDLogInfo(@"Starting memory garbage collector.");
+        NSLog(@"Starting memory garbage collector.");
         int index = _memoryImageCache.count * percent;
         @synchronized(_memoryImageCache)
         {
@@ -415,13 +415,13 @@
         if ([fileManager fileExistsAtPath:cachePath] == YES)
         {
             // Index file is corrupted if we are here
-            DDLogError(@"Error. Index file was corrupted.");
+            NSLog(@"Error. Index file was corrupted.");
             return;
         }
         
         if (![fileManager createFileAtPath:cachePath contents:imageData attributes:nil])
         {
-            DDLogError(@"Failed to create file!");
+            NSLog(@"Failed to create file!");
             return;
         }
         
@@ -430,7 +430,7 @@
                                                                     forKey: NSURLIsExcludedFromBackupKey error: &error];
         if (!success)
         {
-            DDLogError(@"Failed to set NOT_BACKUP attribute.");
+            NSLog(@"Failed to set NOT_BACKUP attribute.");
         }
         
         imageObject.size = [self getFileSize:cachePath];
@@ -448,14 +448,14 @@
         _currentDiskCacheSize = 0;
         if (![fileManager removeItemAtPath:_diskCachePath error:nil])
         {
-            DDLogError(@"Error while removing disk image cache.");
+            NSLog(@"Error while removing disk image cache.");
             return;
         }
         [self loadCache];
     }
     else
     {
-        DDLogInfo(@"Starting disk garbage collector.");
+        NSLog(@"Starting disk garbage collector.");
         int index = _diskImageCache.count * percent;
         @synchronized(_diskImageCache)
         {
