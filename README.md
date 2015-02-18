@@ -36,4 +36,4 @@ Sergey P., zavsby@gmail.com
 
 ## License
 
-SimpleData is available under the MIT license. See the LICENSE file for more info.
+PHImageView is available under the MIT license. See the LICENSE file for more info.
