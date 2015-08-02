@@ -10,8 +10,7 @@
 
 @implementation PHImageObject
 
-+ (instancetype)imageObjectWithName:(NSString *)name size:(NSInteger)size
-{
++ (instancetype)imageObjectWithName:(NSString *)name size:(NSInteger)size {
     PHImageObject *imageObject = [[PHImageObject alloc] init];
     imageObject.key = name;
     imageObject.size = size;

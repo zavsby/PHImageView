@@ -10,30 +10,25 @@
 
 @implementation PHImageCacheParams
 
-+ (id)cacheParams
-{
++ (id)cacheParams {
     return [[self alloc] init];
 }
 
-+ (id)cacheParamsWithTemporary:(BOOL)isTemp
-{
++ (id)cacheParamsWithTemporary:(BOOL)isTemp {
     PHImageCacheParams *params = [[PHImageCacheParams alloc] init];
     params.isTemperaly = isTemp;
     return params;
 }
 
-+ (id)cacheParamsWithShouldSaveToDiskCache:(BOOL)shouldSave
-{
++ (id)cacheParamsWithShouldSaveToDiskCache:(BOOL)shouldSave {
     PHImageCacheParams *params = [[PHImageCacheParams alloc] init];
     params.shouldSaveToDiskCache = shouldSave;
     return params;
 }
 
-- (id)init
-{
+- (id)init {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _shouldSaveToDiskCache = YES;
         _isTemperaly = NO;
     }

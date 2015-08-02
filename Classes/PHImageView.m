@@ -7,123 +7,104 @@
 //
 
 #import "PHImageView.h"
+#import "PHImageCacheManager.h"
+#import "PHImageOperation.h"
+#import "PHImageCacheParams.h"
+
+#import <ProjectHelpers/ProjectHelpers.h>
+
+@interface PHImageView ()
+
+@property (nonatomic, weak) PHImageCacheManager *cacheManager;
+@property (nonatomic, copy) NSString *imageName;
+
+@end
 
 @implementation PHImageView
 
 #pragma mark - Initialization
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    if (self) 
-    {
+    if (self)  {
         [self initialize];
     }
     return self;
 }
 
-- (void)awakeFromNib
-{
+- (void)awakeFromNib {
     [self initialize];
 }
 
-- (id)init
-{
+- (id)init {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         [self initialize];
     }
     return self;
 }
 
-- (void)initialize
-{
+- (void)initialize {
     _cacheManager = [PHImageCacheManager sharedManager];
+    
     [self publicInit];
 }
 
-- (id)initWithURL:(NSURL *)imageUrl
-{
+- (id)initWithURL:(NSURL *)imageUrl {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         [self loadImage:imageUrl];
     }
     return self;
 }
 
-- (id)initWithURL:(NSURL *)imageUrl frame:(CGRect)frame
-{
+- (id)initWithURL:(NSURL *)imageUrl frame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    if (self)
-    {
+    if (self) {
         [self loadImage:imageUrl];
     }
     return self;
 }
-
-#pragma mark - Properties
-
-//- (void)setImageURL:(NSURL *)imageURL
-//{
-//    _imageURL = imageURL;
-//    [self loadImage:imageURL];
-//}
 
 #pragma mark - Async Image View
 
-// PUBLIC METHOD
-- (void)loadImage:(NSURL *)imageUrl
-{
+- (void)loadImage:(NSURL *)imageUrl {
     [self loadImage:imageUrl params:[PHImageCacheParams cacheParamsWithTemporary:NO]];
 }
 
-- (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache
-{
+- (void)loadImage:(NSURL *)imageUrl tempCache:(BOOL)tempCache {
     [self loadImage:imageUrl params:[PHImageCacheParams cacheParamsWithTemporary:tempCache]];
 }
 
-- (void)loadImage:(NSURL *)imageUrl params:(PHImageCacheParams *)params
-{
-    if (imageUrl == nil)
-    {
+- (void)loadImage:(NSURL *)imageUrl params:(PHImageCacheParams *)params {
+    if (imageUrl == nil) {
         self.image = nil;
         return;
     }
     
-    if ([imageUrl.absoluteString isEqualToString:_imageURL.absoluteString] && self.image != nil)
-    {
+    if ([imageUrl.absoluteString isEqualToString:self.imageURL.absoluteString] && self.image != nil) {
         return;
     }
     
-    if (imageUrl != self.imageURL)
-    {
+    if (imageUrl != self.imageURL) {
         self.image = nil;
-        _imageURL = imageUrl;
-        _imageName = [imageUrl.absoluteString md5];
+        self.imageURL = imageUrl;
+        self.imageName = [imageUrl.absoluteString md5];
     }
     
     params.transformBlock = self.transfromBlock;
     
     __weak PHImageView *weakSelf = (PHImageView *)self;
-    [_cacheManager getImage:self.imageURL params:params completion:^(UIImage *image, NSString *imageName, PHImageCacheSourceType sourceType, NSError *error) {
-        if ([weakSelf.imageName isEqualToString:imageName])
-        {
-            if (error)
-            {
+    [self.cacheManager getImage:self.imageURL params:params completion:^(UIImage *image, NSString *imageName, PHImageCacheSourceType sourceType, NSError *error) {
+        if ([weakSelf.imageName isEqualToString:imageName]) {
+            if (error) {
                 [weakSelf failedImageLoading];
-            }
-            else
-            {
-                if (![self finishImageLoading:image sourceType:sourceType])
-                {
-                    weakSelf.image = image;
-                }
+            } else if (![weakSelf finishImageLoading:image sourceType:sourceType]) {
+                weakSelf.image = image;
             }
         }
     } progress:^(PHImageCacheGettingType gettingType) {
-        [self willLoadImage:gettingType];
+        [weakSelf willLoadImage:gettingType];
     }];
 }
 
@@ -137,16 +118,14 @@
 
 #pragma mark - Touch events
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    if (![_delegate respondsToSelector:@selector(asyncImageViewImageDidTapped:)])
-    {
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (![self.delegate respondsToSelector:@selector(imageViewDidTapped:)]) {
         return;
     }
+    
     UITouch *touch = [touches anyObject];
-    if (touch.tapCount == 1)
-    {
-        [_delegate asyncImageViewImageDidTapped:self];
+    if (touch.tapCount == 1) {
+        [_delegate imageViewDidTapped:self];
     }
 }
 

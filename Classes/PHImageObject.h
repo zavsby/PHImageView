@@ -11,7 +11,7 @@
 
 @interface PHImageObject : NSObject
 
-@property (nonatomic, strong) NSString *key;
+@property (nonatomic, copy) NSString *key;
 @property (nonatomic, assign) NSInteger size;
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, assign) BOOL temperaly;

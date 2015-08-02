@@ -7,45 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PHImageObject.h"
-#import "PHImageOperation.h"
-#import "PHImageCacheParams.h"
+#import <UIKit/UIKit.h>
 
-#import "ProjectHelpers.h"
+#import "PHImageViewTypes.h"
 
 @class PHImageView;
 @class PHImageOperation;
-@class HeapPhotoView;
-
-typedef NS_ENUM(NSUInteger, PHImageCacheGettingType)
-{
-    PHImageCacheGettingTypeNotInMemory,
-    PHImageCacheGettingTypeOnDisk,
-    PHImageCacheGettingTypeDownloading,
-    PHImageCacheGettingTypeDownloadFinished
-};
-
-typedef NS_ENUM(NSUInteger, PHImageCacheSourceType)
-{
-    PHImageCacheSourceTypeMemory,
-    PHImageCacheSourceTypeDisk,
-    PHImageCacheSourceTypeServer
-};
-
-typedef void(^PHImageCacheCompletionBlock)(UIImage *image, NSString *imageName, PHImageCacheSourceType sourceType, NSError *error);
-typedef void(^PHImageCacheProgressBlock)(PHImageCacheGettingType gettingType);
-typedef void(^PHImageCacheBatchCompletionBlock)(NSUInteger numberOfSuccessfullOperation, NSArray *images, NSError *error);
+@class PHImageCacheParams;
 
 @interface PHImageCacheManager : NSObject
-{
-    NSMutableArray *_diskImageCache;
-    NSMutableArray *_memoryImageCache;
-    
-    NSInteger _currentDiskCacheSize;
-    NSString *_diskCachePath;
-    
-    NSMutableDictionary *_downloadingImages;
-}
 
 @property (nonatomic, assign) NSInteger maxConcurrentImageOperations;
 @property (nonatomic, assign) NSInteger maxDiskCacheSize;
@@ -57,9 +27,7 @@ typedef void(^PHImageCacheBatchCompletionBlock)(NSUInteger numberOfSuccessfullOp
 // Initializing and preparing for cache (do not call it manually)
 - (void)loadCache;
 
-//
-// Methods for direct getting images
-//
+#pragma mark - Methods for getting images directly
 
 // Returns image from cache (disk or memory), if image is not it cache, return NIL
 - (UIImage *)getImageFromCache:(NSURL *)imageUrl;
@@ -71,23 +39,21 @@ typedef void(^PHImageCacheBatchCompletionBlock)(NSUInteger numberOfSuccessfullOp
 
 - (void)getBatchOfImages:(NSArray *)imageUrls params:(PHImageCacheParams *)params completion:(PHImageCacheBatchCompletionBlock)completion;
 
-//
-// Cache cleaning methods
-//
+#pragma mark - Cache cleaning methods
 
 // Full cleaning of temporary cache in memory
 - (void)clearTemperalyImagesInMemory;
 // Full cleaning of temporary cache on disk (not recommended to call manually)
 - (void)clearTemperalyImagesOnDisk;
 // Manual launch of garbage collector for disk cache (if percent==1 then clean all cache)
-- (void)clearDiskCache:(float)percent;
+- (void)clearDiskCache:(CGFloat)percent;
 // Manual launch of garbage collector for memory cache (if percent==1 then clean all cache)
-- (void)clearMemoryCache:(float)percent;
+- (void)clearMemoryCache:(CGFloat)percent;
 // Method cleans cache before exit from application, it removes temporary cache and clean main cache if needed
 - (void)cleanDiskCacheBeforeExit;
 
 // Returns current disk cache size
-+ (unsigned long)cacheSize;
++ (NSInteger)cacheSize;
 
 @end
 
