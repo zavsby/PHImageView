@@ -6,19 +6,15 @@
 //  Copyright (c) 2012 ITM House. All rights reserved.
 //
 
-#import "PHImageCacheManager.h"
 #import "PHOperation.h"
-#import "PHImageCacheParams.h"
-#import "NSError+Helper.h"
+#import "PHImageViewTypes.h"
 
 @class PHImageOperation;
+@class PHImageCacheParams;
+
 typedef void(^PHImageOperationCompletionBlock)(PHImageOperation *operation);
 
-@interface PHImageOperation : PHOperation <NSURLConnectionDataDelegate>
-{
-    NSHTTPURLResponse *_response;
-    NSPort *_port;
-}
+@interface PHImageOperation : PHOperation
 
 @property (nonatomic, readonly) NSURL *imageUrl;
 @property (nonatomic, readonly) NSMutableData *responseData;

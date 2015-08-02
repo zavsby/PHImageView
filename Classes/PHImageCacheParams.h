@@ -9,7 +9,7 @@
 @import Foundation;
 @import UIKit;
 
-typedef UIImage *(^PHImageCacheTransformBlock)(UIImage *image);
+#import "PHImageViewTypes.h"
 
 @interface PHImageCacheParams : NSObject
 
