@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "PHImageView"
-  s.version      = "2.0.1"
+  s.version      = "2.0.2"
   s.summary      = "The library provides image downloading and caching (two levels) on iOS."
 
   s.description  = <<-DESC
@@ -74,7 +74,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/zavsby/PHImageView.git", :tag => "2.0.1" }
+  s.source       = { :git => "https://github.com/zavsby/PHImageView.git", :tag => "2.0.2" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

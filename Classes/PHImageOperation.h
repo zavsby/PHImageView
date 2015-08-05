@@ -19,7 +19,7 @@ typedef void(^PHImageOperationCompletionBlock)(PHImageOperation *operation);
 @property (nonatomic, readonly) NSURL *imageUrl;
 @property (nonatomic, readonly) NSMutableData *responseData;
 @property (nonatomic, readonly) NSError *error;
-@property (nonatomic, copy) PHImageOperationCompletionBlock completionBlock;
+@property (nonatomic, copy) PHImageOperationCompletionBlock operationCompletionBlock;
 
 @property (nonatomic, strong) PHImageCacheParams *params;
 
