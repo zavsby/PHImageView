@@ -37,7 +37,7 @@
 
 + (instancetype)imageOperationWithURL:(NSURL *)imageUrl completion:(PHImageOperationCompletionBlock)completion {
     PHImageOperation *operation = [[PHImageOperation alloc] initWithImageURL:imageUrl];
-    operation.completionBlock = completion;
+    operation.operationCompletionBlock = completion;
     return operation;
 }
 
@@ -61,7 +61,7 @@
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     if (!self.isCancelled) {
         self.error = error;
-        PERFORM_BLOCK(self.completionBlock, self);
+        PERFORM_BLOCK(self.operationCompletionBlock, self);
     }
     
     self.completionBlock = nil;
@@ -81,10 +81,10 @@
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if (!self.isCancelled) {
         if (self.response.statusCode == 200) {
-            PERFORM_BLOCK(self.completionBlock, self);
+            PERFORM_BLOCK(self.operationCompletionBlock, self);
         } else {
             self.error = [NSError errorWithDomain:@"Error" description:@"Status code is not 200." code:self.response.statusCode];
-            PERFORM_BLOCK(self.completionBlock, self);
+            PERFORM_BLOCK(self.operationCompletionBlock, self);
         }
     }
     
