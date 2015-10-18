@@ -200,6 +200,24 @@ static const CGFloat kDefaultMaxDiskCacheSize = 15.0;
     [self.operationQueue addOperations:operations waitUntilFinished:NO];
 }
 
+#pragma mark - Removing images from cache
+
+- (void)removeImageFromCache:(NSURL *)imageUrl {
+    if (imageUrl) {
+        NSString *imageName = [[imageUrl absoluteString] md5];
+        PHImageObject *imageObject = [self findObjectByKey:imageName inArray:self.diskImageCache];
+        if (imageObject) {
+            [self removeImageFromDiskCache:imageObject];
+        } else {
+            imageObject = [self findObjectByKey:imageName inArray:self.memoryImageCache];
+        }
+        
+        if (imageObject) {
+            [self.memoryImageCache removeObject:imageObject];
+        }
+    }
+}
+
 #pragma mark - Download image operation
 
 - (void)downloadImage:(NSURL *)url name:(NSString *)imageName params:(PHImageCacheParams *)params completion:(PHImageCacheCompletionBlock)completion progress:(PHImageCacheProgressBlock)progressBlock {
@@ -316,7 +334,8 @@ static const CGFloat kDefaultMaxDiskCacheSize = 15.0;
         NSInteger index = self.memoryImageCache.count * percent;
         @synchronized(self.memoryImageCache) {
             for (NSInteger i = 0; i < index; i++) {
-                [self.memoryImageCache[i] setImage:nil];
+                PHImageObject *imageObject = self.memoryImageCache[i];
+                imageObject.image = nil;
             }
             [self.memoryImageCache removeObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, index)]];
         }
@@ -328,8 +347,9 @@ static const CGFloat kDefaultMaxDiskCacheSize = 15.0;
         NSMutableArray *imagesToRemove = [[NSMutableArray alloc] init];
         for (NSInteger i = 0; i < self.memoryImageCache.count; i++) {
             if ([self.memoryImageCache[i] temperaly]) {
-                [self.memoryImageCache[i] setImage:nil];
-                [imagesToRemove addObject:self.memoryImageCache[i]];
+                PHImageObject *imageObject = self.memoryImageCache[i];
+                imageObject.image = nil;
+                [imagesToRemove addObject:imageObject];
             }
         }
         [self.memoryImageCache removeObjectsInArray:imagesToRemove];
@@ -427,6 +447,24 @@ static const CGFloat kDefaultMaxDiskCacheSize = 15.0;
             }
         }
         [self.diskImageCache removeObjectsInArray:photosToRemove];
+    }
+}
+
+- (void)removeImageFromDiskCache:(PHImageObject *)imageObject {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (imageObject.onDiskCache) {
+        NSError *error = nil;
+        [fileManager removeItemAtPath:[self.diskCachePath stringByAppendingPathComponent:imageObject.key] error:&error];
+        
+        if (error) {
+            NSLog(@"Error removing image from disk cache: %@", error.localizedDescription);
+        }
+        
+        self.currentDiskCacheSize -= imageObject.size;
+        
+        @synchronized(self.diskImageCache) {
+            [self.diskImageCache removeObject:imageObject];
+        }
     }
 }
 
