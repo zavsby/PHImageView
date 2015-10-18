@@ -39,6 +39,15 @@
 
 - (void)getBatchOfImages:(NSArray *)imageUrls params:(PHImageCacheParams *)params completion:(PHImageCacheBatchCompletionBlock)completion;
 
+#pragma mark - Removing images from cache
+
+/**
+ *  Removes image from memory and disk cache.
+ *
+ *  @param imageUrl URL of image to remove
+ */
+- (void)removeImageFromCache:(NSURL *)imageUrl;
+
 #pragma mark - Cache cleaning methods
 
 // Full cleaning of temporary cache in memory
